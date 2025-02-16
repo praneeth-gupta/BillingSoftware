@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sai Krishna Opticals - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d6efd !important;
+        }
+        .search-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .patient-table {
+            margin-top: 20px;
+        }
+        .modal-lg {
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">Sai Krishna Opticals</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="search-container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="phoneSearch" class="form-control" placeholder="Enter phone number">
+                        <button class="btn btn-primary" onclick="searchPatient()">Search</button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-success" onclick="showAddPatientModal()">
+                        <i class="bi bi-plus-circle"></i> Add New Patient
+                    </button>
+                </div>
+            </div>
+
+            <div class="patient-table">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div class="modal fade" id="addPatientModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Patient</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPatientForm">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Name *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phone * (10 digits)</label>
+                                <input type="tel" class="form-control" name="phone" pattern="[0-9]{10}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gender *</label>
+                                <select class="form-select" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h6 class="mb-3">Eyesight Information</h6>
+                        <div class="row mb-3">
+                            <!-- Left Eye Section -->
+                            <div class="col-md-6">
+                                <h6>Left Eye</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">L Spherical</label>
+                                        <div class="input-group">
+                                            <select class="form-select flex-grow-0" name="l_spherical_sign" style="width: 80px">
+                                                <option value="+">+</option>
+                                                <option value="-">-</option>
+                                            </select>
+                                            <input type="text" class="form-control" name="l_spherical_value" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">L Cylindrical</label>
+                                        <div class="input-group">
+                                            <select class="form-select flex-grow-0" name="l_cylindrical_sign" style="width: 80px">
+                                                <option value="+">+</option>
+                                                <option value="-">-</option>
+                                            </select>
+                                            <input type="text" class="form-control" name="l_cylindrical_value" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">L Axis</label>
+                                        <input type="text" class="form-control" name="l_axis" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Eye Section -->
+                            <div class="col-md-6">
+                                <h6>Right Eye</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">R Spherical</label>
+                                        <div class="input-group">
+                                            <select class="form-select flex-grow-0" name="r_spherical_sign" style="width: 80px">
+                                                <option value="+">+</option>
+                                                <option value="-">-</option>
+                                            </select>
+                                            <input type="text" class="form-control" name="r_spherical_value" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">R Cylindrical</label>
+                                        <div class="input-group">
+                                            <select class="form-select flex-grow-0" name="r_cylindrical_sign" style="width: 80px">
+                                                <option value="+">+</option>
+                                                <option value="-">-</option>
+                                            </select>
+                                            <input type="text" class="form-control" name="r_cylindrical_value" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">R Axis</label>
+                                        <input type="text" class="form-control" name="r_axis" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Addition</label>
+                                <div class="input-group">
+                                    <select class="form-select flex-grow-0" name="addition_sign" style="width: 80px">
+                                        <option value="+">+</option>
+                                        <option value="-">-</option>
+                                    </select>
+                                    <input type="text" class="form-control" name="addition_value" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="savePatient()">Save Patient</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient History Modal -->
+    <div class="modal fade" id="patientHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Patient History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="historyTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#eyesightHistory">Eyesight History</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#purchaseHistory">Purchase History</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="eyesightHistory">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>R Sph</th>
+                                        <th>R Cyl</th>
+                                        <th>R Axis</th>
+                                        <th>L Sph</th>
+                                        <th>L Cyl</th>
+                                        <th>L Axis</th>
+                                        <th>Add</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eyesightHistoryBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="purchaseHistory">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Details</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseHistoryBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Bill Modal -->
+    <div class="modal fade" id="generateBillModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Bill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="billForm">
+                        <input type="hidden" id="billSerialNumber">
+                        <div class="mb-3">
+                            <label class="form-label">Purchase Details</label>
+                            <textarea class="form-control" id="purchaseDetails" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount (₹)</label>
+                            <input type="number" class="form-control" id="billAmount" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveBill()">Save Bill</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Bootstrap Modal instances
+        let addPatientModal, patientHistoryModal, generateBillModal;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addPatientModal = new bootstrap.Modal(document.getElementById('addPatientModal'));
+            patientHistoryModal = new bootstrap.Modal(document.getElementById('patientHistoryModal'));
+            generateBillModal = new bootstrap.Modal(document.getElementById('generateBillModal'));
+        });
+
+        function showAddPatientModal() {
+            document.getElementById('addPatientForm').reset();
+            addPatientModal.show();
+        }
+
+        async function searchPatient() {
+            const phone = document.getElementById('phoneSearch').value.trim();
+            if (!phone) {
+                alert('Please enter a phone number');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/search_patient', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone })
+                });
+                const data = await response.json();
+
+                const tbody = document.getElementById('patientTableBody');
+                tbody.innerHTML = '';
+
+                if (data.success && data.patients.length > 0) {
+                    data.patients.forEach(patient => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${patient.serial}</td>
+                                <td>${patient.name}</td>
+                                <td>${patient.phone}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="viewHistory('${patient.serial}')">History</button>
+                                    <button class="btn btn-sm btn-warning" onclick="showGenerateBill('${patient.serial}')">Generate Bill</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No patients found</td></tr>';
+                }
+            } catch (error) {
+                alert('Error searching for patient');
+            }
+        }
+
+        async function savePatient() {
+            const form = document.getElementById('addPatientForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                gender: formData.get('gender'),
+                // Left Eye
+                l_spherical: combineSignAndValue(
+                    formData.get('l_spherical_sign'),
+                    formData.get('l_spherical_value')
+                ),
+                l_cylindrical: combineSignAndValue(
+                    formData.get('l_cylindrical_sign'),
+                    formData.get('l_cylindrical_value')
+                ),
+                l_axis: formData.get('l_axis') ? parseFloat(formData.get('l_axis')) : null,
+                // Right Eye
+                r_spherical: combineSignAndValue(
+                    formData.get('r_spherical_sign'),
+                    formData.get('r_spherical_value')
+                ),
+                r_cylindrical: combineSignAndValue(
+                    formData.get('r_cylindrical_sign'),
+                    formData.get('r_cylindrical_value')
+                ),
+                r_axis: formData.get('r_axis') ? parseFloat(formData.get('r_axis')) : null,
+                // Addition
+                addition: combineSignAndValue(
+                    formData.get('addition_sign'),
+                    formData.get('addition_value')
+                )
+            };
+
+            try {
+                const response = await fetch('/api/add_patient', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Patient added successfully!');
+                    addPatientModal.hide();
+                    form.reset();
+                    // Refresh patient list if phone number matches
+                    if (data.phone === document.getElementById('phoneSearch').value.trim()) {
+                        searchPatient();
+                    }
+                } else {
+                    alert(result.message || 'Error adding patient');
+                }
+            } catch (error) {
+                alert('Error adding patient');
+            }
+        }
+
+        function combineSignAndValue(sign, value) {
+            if (!value) return null;
+            value = value.trim();
+            if (!value) return null;
+            
+            // Convert value to float, handling both comma and dot as decimal separator
+            const numValue = parseFloat(value.replace(',', '.'));
+            if (isNaN(numValue)) return null;
+            
+            return sign === '-' ? -numValue : numValue;
+        }
+
+        function formatEyesightValue(value) {
+            if (value === null || value === undefined) return '-';
+            const absValue = Math.abs(value);
+            const sign = value >= 0 ? '+' : '-';
+            return `${sign}${absValue.toFixed(2)}`;
+        }
+
+        async function viewHistory(serialNumber) {
+            try {
+                const response = await fetch(`/api/patient/${serialNumber}/history`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Populate eyesight history
+                    const eyesightBody = document.getElementById('eyesightHistoryBody');
+                    eyesightBody.innerHTML = '';
+                    data.eyesight_history.forEach(record => {
+                        eyesightBody.innerHTML += `
+                            <tr>
+                                <td>${record.date}</td>
+                                <td>${formatEyesightValue(record.r_spherical)}</td>
+                                <td>${formatEyesightValue(record.r_cylindrical)}</td>
+                                <td>${record.r_axis || '-'}</td>
+                                <td>${formatEyesightValue(record.l_spherical)}</td>
+                                <td>${formatEyesightValue(record.l_cylindrical)}</td>
+                                <td>${record.l_axis || '-'}</td>
+                                <td>${formatEyesightValue(record.addition)}</td>
+                            </tr>
+                        `;
+                    });
+
+                    // Populate purchase history
+                    const purchaseBody = document.getElementById('purchaseHistoryBody');
+                    purchaseBody.innerHTML = '';
+                    data.purchase_history.forEach(record => {
+                        purchaseBody.innerHTML += `
+                            <tr>
+                                <td>${record.date}</td>
+                                <td>${record.details || '-'}</td>
+                                <td>₹${record.amount || '-'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    patientHistoryModal.show();
+                }
+            } catch (error) {
+                console.error('Error fetching history:', error);
+                alert('Error fetching patient history');
+            }
+        }
+
+        function showGenerateBill(serialNumber) {
+            document.getElementById('billForm').reset();
+            document.getElementById('billSerialNumber').value = serialNumber;
+            generateBillModal.show();
+        }
+
+        async function saveBill() {
+            const form = document.getElementById('billForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const serialNumber = document.getElementById('billSerialNumber').value;
+            const details = document.getElementById('purchaseDetails').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+
+            try {
+                const response = await fetch('/api/generate_bill', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        serial_number: serialNumber,
+                        details: details,
+                        amount: amount
+                    })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Bill saved successfully!');
+                    generateBillModal.hide();
+                    form.reset();
+                } else {
+                    alert(result.message || 'Error saving bill');
+                }
+            } catch (error) {
+                alert('Error saving bill');
+            }
+        }
+    </script>
+</body>
+</html> 
